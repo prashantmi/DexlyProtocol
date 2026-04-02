@@ -1,0 +1,38 @@
+{
+  "name": "@dexly/protocol",
+  "version": "0.1.0",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./codex-app-server": {
+      "types": "./dist/codex-app-server.d.ts",
+      "default": "./dist/codex-app-server.js"
+    },
+    "./companion": {
+      "types": "./dist/companion.d.ts",
+      "default": "./dist/companion.js"
+    },
+    "./native-bridge": {
+      "types": "./dist/native-bridge.d.ts",
+      "default": "./dist/native-bridge.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:script": "bash scripts/build-protocol.sh"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
