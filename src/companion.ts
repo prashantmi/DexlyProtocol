@@ -1,13 +1,13 @@
 export const DEXLY_COMPANION_HOST_NAME = "ai.dexly.companion";
 export const DEXLY_COMPANION_DISPLAY_NAME = "Dexly Companion";
-export const DEXLY_COMPANION_PACKAGE_NAME = "@dexly/companion";
-export const DEXLY_COMPANION_EXECUTABLE_NAME = "dexly-companion";
+export const DEXLY_COMPANION_PACKAGE_NAME = "@dexlyai/dexly";
+export const DEXLY_COMPANION_EXECUTABLE_NAME = "dexly";
 export const DEXLY_NATIVE_CONNECTION_ENDPOINT = "native://ai.dexly.companion";
-export const DEXLY_COMPANION_INSTALL_COMMAND = "npx -y @dexly/companion install";
-export const DEXLY_COMPANION_DOCTOR_COMMAND = "npx -y @dexly/companion doctor";
-export const DEXLY_COMPANION_UPGRADE_COMMAND = "npx -y @dexly/companion upgrade";
+export const DEXLY_COMPANION_INSTALL_COMMAND = "npx -y @dexlyai/dexly install";
+export const DEXLY_COMPANION_DOCTOR_COMMAND = "npx -y @dexlyai/dexly doctor";
+export const DEXLY_COMPANION_UPGRADE_COMMAND = "npx -y @dexlyai/dexly upgrade";
 export const DEXLY_COMPANION_GLOBAL_INSTALL_COMMAND =
-  "npm i -g @dexly/companion && dexly-companion install";
+  "npm i -g @dexlyai/dexly && dexly install";
 export const DEXLY_COMPANION_CONNECT_COOLDOWN_MS = 15_000;
 export const DEXLY_CODEX_INSTALL_COMMAND = "npm install -g @openai/codex";
 export const DEXLY_CODEX_UPGRADE_COMMAND = "codex --upgrade";
