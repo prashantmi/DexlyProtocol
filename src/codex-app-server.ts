@@ -147,6 +147,11 @@ export interface CodexTurnStartParams {
   effort?: string;
 }
 
+export interface CodexTurnInterruptParams {
+  threadId: string;
+  turnId: string;
+}
+
 export type MessagePhase = "commentary" | "final_answer";
 
 export type CommandAction =
