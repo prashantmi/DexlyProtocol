@@ -59,6 +59,37 @@ export interface TurnStartResponse {
   turn: CodexTurn;
 }
 
+export interface CodexModelReasoningEffortOption {
+  reasoningEffort: string;
+  description?: string | null;
+}
+
+export interface CodexModelCatalogEntry {
+  id: string;
+  model: string;
+  displayName?: string | null;
+  hidden?: boolean;
+  defaultReasoningEffort?: string | null;
+  supportedReasoningEfforts?: CodexModelReasoningEffortOption[] | null;
+  inputModalities?: string[] | null;
+  supportsPersonality?: boolean;
+  isDefault?: boolean;
+  additionalSpeedTiers?: string[] | null;
+  upgrade?: string | null;
+  upgradeInfo?: unknown | null;
+}
+
+export interface CodexModelListParams {
+  cursor?: string | null;
+  limit?: number | null;
+  includeHidden?: boolean;
+}
+
+export interface CodexModelListResponse {
+  data: CodexModelCatalogEntry[];
+  nextCursor: string | null;
+}
+
 export interface CodexInitializeParams {
   clientInfo: {
     name: string;
@@ -80,6 +111,8 @@ export interface CodexThreadStartParams {
   serviceName: string;
   experimentalRawEvents: boolean;
   persistExtendedHistory: boolean;
+  model?: string;
+  serviceTier?: string;
 }
 
 export interface CodexThreadResumeParams {
@@ -88,6 +121,8 @@ export interface CodexThreadResumeParams {
   approvalPolicy: "on-request";
   sandbox: "workspace-write";
   persistExtendedHistory: boolean;
+  model?: string;
+  serviceTier?: string;
 }
 
 export interface CodexTurnStartParams {
@@ -107,6 +142,9 @@ export interface CodexTurnStartParams {
         path: string;
       }
   >;
+  model?: string;
+  serviceTier?: string;
+  effort?: string;
 }
 
 export type MessagePhase = "commentary" | "final_answer";
