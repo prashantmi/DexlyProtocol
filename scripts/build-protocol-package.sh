@@ -7,6 +7,15 @@ PACKAGE_JSON="$ROOT_DIR/package.json"
 LOCKFILE="$ROOT_DIR/package-lock.json"
 NODE_MODULES_LOCK="$ROOT_DIR/node_modules/.package-lock.json"
 
+usage() {
+  cat <<'EOF'
+Usage: bash scripts/build-protocol-package.sh
+
+Install Dexly Protocol dependencies when needed, then build the shared
+@dexly/protocol package into dist/.
+EOF
+}
+
 require_command() {
   local command_name="$1"
   if ! command -v "$command_name" >/dev/null 2>&1; then
@@ -36,6 +45,11 @@ needs_install() {
 }
 
 main() {
+  if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+  fi
+
   require_command node
   require_command npm
 

@@ -27,7 +27,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:script": "bash scripts/build-protocol.sh"
+    "build:script": "bash scripts/build-protocol-package.sh"
   },
   "publishConfig": {
     "access": "public"
