@@ -64,6 +64,12 @@ export interface CodexModelReasoningEffortOption {
   description?: string | null;
 }
 
+export interface CodexModelServiceTier {
+  id: string;
+  name: string;
+  description: string;
+}
+
 export interface CodexModelCatalogEntry {
   id: string;
   model: string;
@@ -74,7 +80,10 @@ export interface CodexModelCatalogEntry {
   inputModalities?: string[] | null;
   supportsPersonality?: boolean;
   isDefault?: boolean;
+  /** @deprecated Codex now advertises structured `serviceTiers`. */
   additionalSpeedTiers?: string[] | null;
+  serviceTiers?: CodexModelServiceTier[] | null;
+  defaultServiceTier?: string | null;
   upgrade?: string | null;
   upgradeInfo?: unknown | null;
 }
@@ -106,8 +115,8 @@ export type CodexInitializedNotification = JsonRpcNotification<"initialized", Re
 
 export interface CodexThreadStartParams {
   cwd: string;
-  approvalPolicy: "on-request";
-  sandbox: "workspace-write";
+  approvalPolicy: "on-request" | "never";
+  sandbox: "workspace-write" | "read-only";
   serviceName: string;
   experimentalRawEvents: boolean;
   persistExtendedHistory: boolean;
@@ -118,8 +127,8 @@ export interface CodexThreadStartParams {
 export interface CodexThreadResumeParams {
   threadId: string;
   cwd?: string;
-  approvalPolicy: "on-request";
-  sandbox: "workspace-write";
+  approvalPolicy: "on-request" | "never";
+  sandbox: "workspace-write" | "read-only";
   persistExtendedHistory: boolean;
   model?: string;
   serviceTier?: string;
@@ -145,6 +154,7 @@ export interface CodexTurnStartParams {
   model?: string;
   serviceTier?: string;
   effort?: string;
+  outputSchema?: unknown;
 }
 
 export interface CodexTurnInterruptParams {
