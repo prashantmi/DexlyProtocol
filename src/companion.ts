@@ -1,3 +1,5 @@
+import codexCompatibility from "./codex-compatibility.json";
+
 export const DEXLY_COMPANION_HOST_NAME = "ai.dexly.companion";
 export const DEXLY_COMPANION_DISPLAY_NAME = "Dexly Companion";
 export const DEXLY_COMPANION_PACKAGE_NAME = "@dexlyai/dexly";
@@ -9,8 +11,14 @@ export const DEXLY_COMPANION_UPGRADE_COMMAND = "npx -y @dexlyai/dexly upgrade";
 export const DEXLY_COMPANION_GLOBAL_INSTALL_COMMAND =
   "npm i -g @dexlyai/dexly && dexly install";
 export const DEXLY_COMPANION_CONNECT_COOLDOWN_MS = 15_000;
-export const DEXLY_CODEX_INSTALL_COMMAND = "npm install -g @openai/codex";
-export const DEXLY_CODEX_UPGRADE_COMMAND = "codex --upgrade";
+export const DEXLY_CODEX_COMPATIBILITY = codexCompatibility;
+export const DEXLY_CODEX_COMPATIBLE_VERSION = DEXLY_CODEX_COMPATIBILITY.version;
+export const DEXLY_CODEX_PACKAGE_SPEC =
+  `${DEXLY_CODEX_COMPATIBILITY.packageName}@${DEXLY_CODEX_COMPATIBLE_VERSION}`;
+// Installing an exact global npm package version handles first install, upgrade,
+// downgrade, and repair while keeping Dexly on the tested Codex contract.
+export const DEXLY_CODEX_INSTALL_COMMAND = `npm install -g ${DEXLY_CODEX_PACKAGE_SPEC}`;
+export const DEXLY_CODEX_UPGRADE_COMMAND = DEXLY_CODEX_INSTALL_COMMAND;
 export const DEXLY_CODEX_INSTALL_DOCS_URL =
   "https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started";
 

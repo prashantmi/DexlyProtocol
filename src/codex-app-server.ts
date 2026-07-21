@@ -114,7 +114,7 @@ export interface CodexInitializeParams {
 export type CodexInitializedNotification = JsonRpcNotification<"initialized", Record<string, never>>;
 
 export interface CodexThreadStartParams {
-  cwd: string;
+  cwd: string | null;
   approvalPolicy: "on-request" | "never";
   sandbox: "workspace-write" | "read-only";
   serviceName: string;
@@ -126,7 +126,7 @@ export interface CodexThreadStartParams {
 
 export interface CodexThreadResumeParams {
   threadId: string;
-  cwd?: string;
+  cwd?: string | null;
   approvalPolicy: "on-request" | "never";
   sandbox: "workspace-write" | "read-only";
   persistExtendedHistory: boolean;
