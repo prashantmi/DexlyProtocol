@@ -10,7 +10,8 @@ export type DexlyBridgeMessageKind =
   | DexlyBridgeHostAction
   | "host/result"
   | "host/error"
-  | "codex/jsonrpc";
+  | "codex/jsonrpc"
+  | "codex/jsonrpc-chunk";
 
 export interface DexlyHostCapabilities {
   update: boolean;
@@ -95,12 +96,27 @@ export interface DexlyBridgeError {
   requestId: string | null;
   code: string;
   message: string;
+  /** Older companions omit this field; clients must treat omission as fatal. */
+  fatal?: boolean;
   details?: unknown;
 }
 
 export interface DexlyBridgeJsonRpcMessage {
   kind: "codex/jsonrpc";
   payload: JsonRpcMessage;
+}
+
+/**
+ * One bridge-safe fragment of a serialized JSON-RPC payload. Chrome limits
+ * native-host-to-extension messages to 1 MiB, so the companion uses this
+ * envelope whenever a complete `codex/jsonrpc` envelope would exceed it.
+ */
+export interface DexlyBridgeJsonRpcChunk {
+  kind: "codex/jsonrpc-chunk";
+  messageId: string;
+  index: number;
+  total: number;
+  data: string;
 }
 
 export type DexlyBridgeClientMessage =
@@ -110,7 +126,8 @@ export type DexlyBridgeClientMessage =
 export type DexlyBridgeHostMessage =
   | DexlyBridgeResult
   | DexlyBridgeError
-  | DexlyBridgeJsonRpcMessage;
+  | DexlyBridgeJsonRpcMessage
+  | DexlyBridgeJsonRpcChunk;
 
 export function isDexlyBridgeJsonRpcMessage(value: unknown): value is DexlyBridgeJsonRpcMessage {
   return typeof value === "object"
@@ -118,4 +135,19 @@ export function isDexlyBridgeJsonRpcMessage(value: unknown): value is DexlyBridg
     && "kind" in value
     && value.kind === "codex/jsonrpc"
     && "payload" in value;
+}
+
+export function isDexlyBridgeJsonRpcChunk(value: unknown): value is DexlyBridgeJsonRpcChunk {
+  return typeof value === "object"
+    && value != null
+    && "kind" in value
+    && value.kind === "codex/jsonrpc-chunk"
+    && "messageId" in value
+    && typeof value.messageId === "string"
+    && "index" in value
+    && typeof value.index === "number"
+    && "total" in value
+    && typeof value.total === "number"
+    && "data" in value
+    && typeof value.data === "string";
 }

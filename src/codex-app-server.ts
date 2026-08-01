@@ -107,6 +107,8 @@ export interface CodexInitializeParams {
   };
   capabilities: {
     experimentalApi: boolean;
+    requestAttestation?: boolean;
+    mcpServerOpenaiFormElicitation?: boolean;
     optOutNotificationMethods?: string[] | null;
   } | null;
 }
@@ -244,6 +246,11 @@ export type ThreadItem =
       memoryCitation: unknown | null;
     }
   | {
+      type: "plan";
+      id: string;
+      text: string;
+    }
+  | {
       type: "reasoning";
       id: string;
       summary: string[];
@@ -312,6 +319,10 @@ export type ThreadItem =
       id: string;
       path: string;
     }
+  | {
+      type: "contextCompaction";
+      id: string;
+    }
   | GenericThreadItem;
 
 export interface ThreadStatusChangedNotification {
@@ -371,11 +382,88 @@ export interface ErrorNotification {
   message: string;
 }
 
+export type TurnPlanStepStatus = "pending" | "inProgress" | "completed";
+
+export interface TurnPlanStep {
+  step: string;
+  status: TurnPlanStepStatus;
+}
+
+export interface TurnPlanUpdatedNotification {
+  threadId: string;
+  turnId: string;
+  explanation: string | null;
+  plan: TurnPlanStep[];
+}
+
+export interface TokenUsageBreakdown {
+  totalTokens: number;
+  inputTokens: number;
+  cachedInputTokens: number;
+  outputTokens: number;
+  reasoningOutputTokens: number;
+}
+
+export interface ThreadTokenUsage {
+  total: TokenUsageBreakdown;
+  last: TokenUsageBreakdown;
+  modelContextWindow: number | null;
+}
+
+export interface ThreadTokenUsageUpdatedNotification {
+  threadId: string;
+  turnId: string;
+  tokenUsage: ThreadTokenUsage;
+}
+
+export interface ContextCompactedNotification {
+  threadId: string;
+  turnId: string;
+}
+
+export interface ModelReroutedNotification {
+  threadId: string;
+  turnId: string;
+  fromModel: string;
+  toModel: string;
+  reason: string;
+}
+
+export interface WarningNotification {
+  threadId: string | null;
+  message: string;
+}
+
+export interface GuardianWarningNotification {
+  threadId: string;
+  message: string;
+}
+
+export interface DeprecationNoticeNotification {
+  summary: string;
+  details: string | null;
+}
+
+export interface ConfigWarningNotification {
+  summary: string;
+  details: string | null;
+  path?: string;
+  range?: unknown;
+}
+
+export interface ServerRequestResolvedNotification {
+  threadId: string;
+  requestId: JsonRpcId;
+}
+
 export type CodexServerNotification =
   | JsonRpcNotification<"error", ErrorNotification>
   | JsonRpcNotification<"thread/status/changed", ThreadStatusChangedNotification>
+  | JsonRpcNotification<"thread/tokenUsage/updated", ThreadTokenUsageUpdatedNotification>
+  | JsonRpcNotification<"thread/compacted", ContextCompactedNotification>
   | JsonRpcNotification<"turn/started", TurnLifecycleNotification>
   | JsonRpcNotification<"turn/completed", TurnLifecycleNotification>
+  | JsonRpcNotification<"turn/plan/updated", TurnPlanUpdatedNotification>
   | JsonRpcNotification<"item/started", ItemLifecycleNotification>
   | JsonRpcNotification<"item/completed", ItemLifecycleNotification>
   | JsonRpcNotification<"item/agentMessage/delta", DeltaNotification>
@@ -385,7 +473,13 @@ export type CodexServerNotification =
   | JsonRpcNotification<"item/commandExecution/outputDelta", DeltaNotification>
   | JsonRpcNotification<"item/commandExecution/terminalInteraction", TerminalInteractionNotification>
   | JsonRpcNotification<"item/fileChange/outputDelta", DeltaNotification>
-  | JsonRpcNotification<"item/mcpToolCall/progress", McpToolCallProgressNotification>;
+  | JsonRpcNotification<"item/mcpToolCall/progress", McpToolCallProgressNotification>
+  | JsonRpcNotification<"serverRequest/resolved", ServerRequestResolvedNotification>
+  | JsonRpcNotification<"model/rerouted", ModelReroutedNotification>
+  | JsonRpcNotification<"warning", WarningNotification>
+  | JsonRpcNotification<"guardianWarning", GuardianWarningNotification>
+  | JsonRpcNotification<"deprecationNotice", DeprecationNoticeNotification>
+  | JsonRpcNotification<"configWarning", ConfigWarningNotification>;
 
 export interface CommandApprovalParams {
   threadId: string;
