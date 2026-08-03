@@ -99,6 +99,45 @@ export interface CodexModelListResponse {
   nextCursor: string | null;
 }
 
+export interface CodexAccount {
+  type: string;
+  email?: string | null;
+  planType?: string | null;
+  credentialSource?: string | null;
+}
+
+export interface CodexAccountReadParams {
+  refreshToken: boolean;
+}
+
+export interface CodexAccountReadResponse {
+  account: CodexAccount | null;
+  requiresOpenaiAuth: boolean;
+}
+
+export interface CodexChatGptLoginStartParams {
+  type: "chatgpt";
+  useHostedLoginSuccessPage: boolean;
+  appBrand: "codex" | "chatgpt";
+}
+
+export interface CodexChatGptLoginStartResponse {
+  type: "chatgpt";
+  loginId: string;
+  authUrl: string;
+}
+
+export interface CodexAccountLoginCompletedNotification {
+  loginId: string | null;
+  success: boolean;
+  error: string | null;
+}
+
+export interface CodexAccountUpdatedNotification {
+  authMode: string | null;
+  planType: string | null;
+}
+
 export interface CodexInitializeParams {
   clientInfo: {
     name: string;
@@ -458,6 +497,8 @@ export interface ServerRequestResolvedNotification {
 
 export type CodexServerNotification =
   | JsonRpcNotification<"error", ErrorNotification>
+  | JsonRpcNotification<"account/login/completed", CodexAccountLoginCompletedNotification>
+  | JsonRpcNotification<"account/updated", CodexAccountUpdatedNotification>
   | JsonRpcNotification<"thread/status/changed", ThreadStatusChangedNotification>
   | JsonRpcNotification<"thread/tokenUsage/updated", ThreadTokenUsageUpdatedNotification>
   | JsonRpcNotification<"thread/compacted", ContextCompactedNotification>
