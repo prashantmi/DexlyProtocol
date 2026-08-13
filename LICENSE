@@ -1,0 +1,36 @@
+PROPRIETARY AND CONFIDENTIAL CONTRIBUTOR LICENSE AGREEMENT
+
+Copyright (c) 2026 Prashant Mishra. All Rights Reserved.
+
+1. OWNERSHIP
+All source code, documentation, assets, binaries, architecture, and intellectual 
+property associated with this project (including DexlyExtension, DexlyCompanion, 
+DexlyProtocol, and DexlyWorkspace) remain the sole property of Prashant Mishra.
+
+2. LIMITED PERMISSION TO AUTHORIZED COLLABORATORS
+Subject to access granted by the copyright owner, authorized contributors and 
+collaborators are granted a limited, non-exclusive, non-transferable, revocable 
+license solely to:
+  (a) Clone, checkout, and build the project locally for development and testing;
+  (b) Create feature branches and submit pull requests / contributions back to the 
+      official project repositories.
+
+3. RESTRICTIONS
+You shall NOT, directly or indirectly:
+  (a) Publish, distribute, package, fork, or host this software or derivative works 
+      on any store, marketplace, or repository (including but not limited to the 
+      Chrome Web Store, npm registry, GitHub public/private repositories, or web servers);
+  (b) Re-brand, sell, lease, sublicense, or commercially exploit this product, 
+      extension, companion app, or any portion thereof;
+  (c) Remove, alter, or obscure any copyright, trademark, or proprietary notices.
+
+4. OWNERSHIP OF CONTRIBUTIONS
+By submitting any contributions, bug fixes, features, or code changes (via pull 
+requests, commits, or patches), you agree that all such contributions immediately 
+become the property of Prashant Mishra without additional compensation or royalty obligations.
+
+5. TERMINATION
+This license automatically terminates upon revoking your access to the repository. 
+Upon termination, you must delete all local copies of the codebase.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
