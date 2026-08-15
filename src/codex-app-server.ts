@@ -40,6 +40,10 @@ export interface CodexThread {
   preview: string;
   cwd: string;
   name: string | null;
+  /** Section this thread belongs to (Codex >= 0.147); null/absent when unsectioned. */
+  section?: ThreadSection | null;
+  /** ISO timestamp the thread entered its current section, when sectioned. */
+  sectionEnteredAt?: string | null;
 }
 
 export type TurnStatus = "completed" | "interrupted" | "failed" | "inProgress";
@@ -441,6 +445,8 @@ export interface TokenUsageBreakdown {
   cachedInputTokens: number;
   outputTokens: number;
   reasoningOutputTokens: number;
+  /** Cache-write input tokens (Codex >= 0.147); absent on older CLIs. */
+  cacheWriteInputTokens?: number;
 }
 
 export interface ThreadTokenUsage {
@@ -502,6 +508,7 @@ export type CodexServerNotification =
   | JsonRpcNotification<"thread/status/changed", ThreadStatusChangedNotification>
   | JsonRpcNotification<"thread/tokenUsage/updated", ThreadTokenUsageUpdatedNotification>
   | JsonRpcNotification<"thread/compacted", ContextCompactedNotification>
+  | JsonRpcNotification<"thread/reverted", ThreadRevertedNotification>
   | JsonRpcNotification<"turn/started", TurnLifecycleNotification>
   | JsonRpcNotification<"turn/completed", TurnLifecycleNotification>
   | JsonRpcNotification<"turn/plan/updated", TurnPlanUpdatedNotification>
@@ -578,3 +585,175 @@ export type JsonRpcOutboundMessage =
 export type JsonRpcMessage =
   | JsonRpcInboundMessage
   | JsonRpcOutboundMessage;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Codex 0.147.0 stable feature surfaces.
+//
+// Wire field names are camelCase to match Codex's `#[serde(rename_all =
+// "camelCase")]`. These methods carry no `experimentalApi` gating in Codex, so
+// Dexly reaches them with `capabilities.experimentalApi = false`. Requests for
+// methods an older CLI does not implement fail with JSON-RPC -32601
+// (method not found); transports degrade those to an absent result.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Apps API — `app/installed`, `app/read` ───────────────────────────────────
+
+/** One entry from the committed installed-connector runtime snapshot. */
+export interface CodexInstalledApp {
+  id: string;
+  /** Best-effort name from the runtime tool catalog; canonical name via `app/read`. */
+  runtimeName: string | null;
+  /** Effective enabled state after global/workspace/local/managed config. */
+  enabled: boolean;
+  /** Enabled AND exposes a model-visible tool allowed by effective policy. */
+  callable: boolean;
+}
+
+export interface CodexAppsInstalledParams {
+  threadId?: string | null;
+  forceRefresh?: boolean;
+}
+
+export interface CodexAppsInstalledResponse {
+  apps: CodexInstalledApp[];
+}
+
+/** Display-only tool summary returned by `app/read` when `includeTools` is set. */
+export interface CodexAppToolSummary {
+  name: string;
+  title: string | null;
+  description: string;
+  isEnabled: boolean;
+  disabledReason: string | null;
+  isReadOnly: boolean;
+}
+
+/** Canonical connector metadata returned by `app/read`. */
+export interface CodexConnectorMetadata {
+  id: string;
+  name: string;
+  description: string | null;
+  iconUrl: string | null;
+  iconUrlDark: string | null;
+  distributionChannel: string | null;
+  installUrl: string | null;
+  pluginDisplayNames: string[];
+  toolSummaries: CodexAppToolSummary[] | null;
+}
+
+export interface CodexAppsReadParams {
+  /** App ids to read (server caps at 100, dedupes, preserves first-seen order). */
+  appIds: string[];
+  threadId?: string | null;
+  /** Include display-only tool summaries in each connector's metadata. */
+  includeTools?: boolean;
+}
+
+export interface CodexAppsReadResponse {
+  apps: CodexConnectorMetadata[];
+  missingAppIds: string[];
+}
+
+// ── Account usage — `account/usage/read` ─────────────────────────────────────
+
+export interface CodexAccountTokenUsageSummary {
+  lifetimeTokens: number | null;
+  peakDailyTokens: number | null;
+  longestRunningTurnSec: number | null;
+  currentStreakDays: number | null;
+  longestStreakDays: number | null;
+}
+
+export interface CodexAccountTokenUsageDailyBucket {
+  startDate: string;
+  tokens: number;
+}
+
+export interface CodexAccountUsageParams {
+  /** When set, read estimated usage for this thread instead of account-wide. */
+  threadId?: string | null;
+}
+
+export interface CodexAccountUsageResponse {
+  summary: CodexAccountTokenUsageSummary;
+  dailyUsageBuckets?: CodexAccountTokenUsageDailyBucket[] | null;
+  /** Present only when a thread was requested and its billing route is available. */
+  threadUsage?: unknown | null;
+}
+
+// ── Thread sections — `threadSection/*`, `thread/section/move` ────────────────
+// Foundation types. Dexly has no thread-list browser today, so these have no UI
+// surface yet; they keep the contract ready for when one is added.
+
+export interface ThreadSectionAppearance {
+  /** Opaque appearance payload (icon/color); shape intentionally loose pending UI. */
+  [key: string]: unknown;
+}
+
+export interface ThreadSection {
+  id: string;
+  name: string;
+  appearance?: ThreadSectionAppearance | null;
+}
+
+export interface ThreadSectionListParams {
+  cursor?: string | null;
+  limit?: number | null;
+}
+
+export interface ThreadSectionListResponse {
+  data: ThreadSection[];
+  nextCursor: string | null;
+}
+
+export interface ThreadSectionCreateParams {
+  name: string;
+  appearance?: ThreadSectionAppearance | null;
+}
+
+export interface ThreadSectionCreateResponse {
+  section: ThreadSection;
+}
+
+export interface ThreadSectionUpdateParams {
+  sectionId: string;
+  name: string;
+  appearance?: ThreadSectionAppearance | null;
+}
+
+export interface ThreadSectionUpdateResponse {
+  section: ThreadSection;
+}
+
+export interface ThreadSectionDeleteParams {
+  sectionId: string;
+}
+
+export interface ThreadSectionMoveParams {
+  threadId: string;
+  /** Destination section, or `null` to remove the thread from its section. */
+  sectionId: string | null;
+  /** Existing thread to insert before; omit/null appends to the section. */
+  beforeThreadId?: string | null;
+}
+
+// ── Thread revert — `thread/revert` + `thread/reverted` (Codex >= 0.148) ──────
+// Feature-detected: the notification is already relayed and typed here, but the
+// UI is gated on codexVersion >= 0.148.0 where `thread/revert` exists.
+
+export interface ThreadRevertParams {
+  threadId: string;
+  /** Turn excluded from the replacement history, along with every later turn. */
+  beforeTurnId: string;
+}
+
+export interface ThreadRevertResponse {
+  /** Updated thread metadata; `turns` is empty — rehydrate via thread/turns/list. */
+  thread: CodexThread;
+  turnsBackwardsCursor: string | null;
+  itemsBackwardsCursor: string | null;
+}
+
+export interface ThreadRevertedNotification {
+  threadId: string;
+}
