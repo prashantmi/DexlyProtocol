@@ -31,7 +31,7 @@ export const DEXLY_OPENCODE_INSTALL_COMMAND =
 export const DEXLY_OPENCODE_AUTH_COMMAND = "opencode auth login";
 // OpenCode is capability-gated separately so Codex remains usable with older
 // Companion releases that predate the agent-neutral bridge.
-export const DEXLY_OPENCODE_MINIMUM_COMPANION_VERSION = "1.1.0";
+export const DEXLY_OPENCODE_MINIMUM_COMPANION_VERSION = "1.2.0";
 export const DEXLY_OPENCODE_WEB_MINIMUM_COMPANION_VERSION = "1.2.0";
 export const DEXLY_AGENT_PROTOCOL_VERSION = 2;
 
