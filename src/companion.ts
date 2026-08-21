@@ -1,4 +1,5 @@
 import codexCompatibility from "./codex-compatibility.json";
+import opencodeCompatibility from "./opencode-compatibility.json";
 
 export const DEXLY_COMPANION_HOST_NAME = "ai.dexly.companion";
 export const DEXLY_COMPANION_DISPLAY_NAME = "Dexly Companion";
@@ -21,6 +22,18 @@ export const DEXLY_CODEX_INSTALL_COMMAND = `npm install -g ${DEXLY_CODEX_PACKAGE
 export const DEXLY_CODEX_UPGRADE_COMMAND = DEXLY_CODEX_INSTALL_COMMAND;
 export const DEXLY_CODEX_INSTALL_DOCS_URL =
   "https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started";
+export const DEXLY_OPENCODE_COMPATIBILITY = opencodeCompatibility;
+export const DEXLY_OPENCODE_COMPATIBLE_VERSION = DEXLY_OPENCODE_COMPATIBILITY.version;
+export const DEXLY_OPENCODE_PACKAGE_SPEC =
+  `${DEXLY_OPENCODE_COMPATIBILITY.packageName}@${DEXLY_OPENCODE_COMPATIBLE_VERSION}`;
+export const DEXLY_OPENCODE_INSTALL_COMMAND =
+  `npx -y ${DEXLY_COMPANION_PACKAGE_NAME} install-opencode`;
+export const DEXLY_OPENCODE_AUTH_COMMAND = "opencode auth login";
+// OpenCode is capability-gated separately so Codex remains usable with older
+// Companion releases that predate the agent-neutral bridge.
+export const DEXLY_OPENCODE_MINIMUM_COMPANION_VERSION = "1.2.0";
+export const DEXLY_OPENCODE_WEB_MINIMUM_COMPANION_VERSION = "1.2.0";
+export const DEXLY_AGENT_PROTOCOL_VERSION = 2;
 
 export type DexlyExtensionBuildChannel = "development" | "production";
 export type DexlyCompanionReleaseChannel = "latest" | "beta" | "canary";
