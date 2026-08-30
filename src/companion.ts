@@ -29,11 +29,16 @@ export const DEXLY_OPENCODE_PACKAGE_SPEC =
 export const DEXLY_OPENCODE_INSTALL_COMMAND =
   `npx -y ${DEXLY_COMPANION_PACKAGE_NAME} install-opencode`;
 export const DEXLY_OPENCODE_AUTH_COMMAND = "opencode auth login";
+export const DEXLY_DEEPSEEK_INSTALL_COMMAND = "npm install -g @deepseek-ai/dsh";
+export const DEXLY_DEEPSEEK_SETUP_COMMAND = "dsh web";
+export const DEXLY_CURSOR_INSTALL_DOCS_URL = "https://cursor.com/docs/cli/installation";
+export const DEXLY_CURSOR_AUTH_COMMAND = "agent login";
 // OpenCode is capability-gated separately so Codex remains usable with older
 // Companion releases that predate the agent-neutral bridge.
 export const DEXLY_OPENCODE_MINIMUM_COMPANION_VERSION = "1.2.0";
 export const DEXLY_OPENCODE_WEB_MINIMUM_COMPANION_VERSION = "1.2.0";
-export const DEXLY_AGENT_PROTOCOL_VERSION = 2;
+export const DEXLY_MULTI_ACP_MINIMUM_COMPANION_VERSION = "1.3.0";
+export const DEXLY_AGENT_PROTOCOL_VERSION = 3;
 
 export type DexlyExtensionBuildChannel = "development" | "production";
 export type DexlyCompanionReleaseChannel = "latest" | "beta" | "canary";

@@ -1,10 +1,22 @@
-export type DexlyAgentId = "codex" | "opencode";
+export const DEXLY_AGENT_IDS = ["codex", "opencode", "deepseek", "cursor"] as const;
+
+export type DexlyAgentId = typeof DEXLY_AGENT_IDS[number];
 
 export type DexlyAgentProtocol = "codex-app-server" | "acp-v1";
 
 export type DexlyAgentRuntimeProfile = "code" | "web-readonly";
 
 export type DexlyAgentStructuredOutputMode = "native" | "prompted" | "none";
+
+export type DexlyAgentAuthStrategy = "none" | "cli" | "acp";
+
+export interface DexlyAgentAuthDescriptor {
+  strategy: DexlyAgentAuthStrategy;
+  required: boolean;
+  /** Safe command shown to users; credentials are never transported by Dexly. */
+  loginCommand?: string;
+  accountScoped: boolean;
+}
 
 export interface DexlyAgentCapabilities {
   images: boolean;
@@ -29,8 +41,51 @@ export interface DexlyAgentDescriptor {
   installable: boolean;
   version: string | null;
   requiredVersion: string | null;
+  auth?: DexlyAgentAuthDescriptor;
   reason?: string | null;
   capabilities: DexlyAgentCapabilities;
+}
+
+export type DexlyAgentErrorCategory =
+  | "invalid_input"
+  | "unsupported_capability"
+  | "not_installed"
+  | "incompatible_version"
+  | "authentication"
+  | "quota"
+  | "network"
+  | "process"
+  | "bridge"
+  | "protocol"
+  | "session"
+  | "permission"
+  | "cancellation"
+  | "structured_output"
+  | "internal";
+
+export interface DexlyAgentError {
+  code: string;
+  category: DexlyAgentErrorCategory;
+  agentId: DexlyAgentId;
+  operation: string;
+  runtimeProfile: DexlyAgentRuntimeProfile;
+  correlationId: string;
+  retryable: boolean;
+  retryAfterMs?: number;
+  taskStarted: boolean;
+  partialOutputPossible: boolean;
+  message: string;
+  recommendedAction:
+    | "retry"
+    | "login"
+    | "install"
+    | "update"
+    | "start_fresh"
+    | "reconnect"
+    | "remain_on_current_agent"
+    | "none";
+  /** Bounded, redacted troubleshooting context. Never contains prompts or credentials. */
+  diagnostic?: string;
 }
 
 export interface DexlyAgentSessionRef {
@@ -76,7 +131,8 @@ export type DexlyAgentEvent =
   | { type: "warning"; agentId: DexlyAgentId; message: string; fatal: boolean };
 
 export function isDexlyAgentId(value: unknown): value is DexlyAgentId {
-  return value === "codex" || value === "opencode";
+  return typeof value === "string"
+    && (DEXLY_AGENT_IDS as readonly string[]).includes(value);
 }
 
 export function isDexlyAgentRuntimeProfile(value: unknown): value is DexlyAgentRuntimeProfile {
