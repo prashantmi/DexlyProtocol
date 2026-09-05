@@ -1,0 +1,9 @@
+{
+  "packageName": "opencode-ai",
+  "version": "1.18.18",
+  "protocol": "acp-v1",
+  "macOSBinarySha256": {
+    "arm64": "4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422",
+    "x64": "c9be687513fd652ca53018901457eb0911cb505dc9cdc494a0ae3645970699ee"
+  }
+}

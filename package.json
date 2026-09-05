@@ -16,6 +16,10 @@
       "types": "./dist/codex-app-server.d.ts",
       "default": "./dist/codex-app-server.js"
     },
+    "./agents": {
+      "types": "./dist/agents.d.ts",
+      "default": "./dist/agents.js"
+    },
     "./companion": {
       "types": "./dist/companion.d.ts",
       "default": "./dist/companion.js"

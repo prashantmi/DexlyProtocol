@@ -1,0 +1,7 @@
+{
+  "minimumTestedVersion": "2026.05.24",
+  "protocolVersion": 1,
+  "executableName": "cursor-agent",
+  "arguments": ["acp"],
+  "documentationUrl": "https://prod.cursor.com/docs/cli/acp"
+}

@@ -1,0 +1,8 @@
+{
+  "packageName": "@deepseek-ai/dsh",
+  "version": "0.1.2-alpha.2",
+  "protocolVersion": 1,
+  "minimumNodeVersion": "22.19.0",
+  "executableName": "dsh",
+  "arguments": ["--profile", "acp"]
+}
