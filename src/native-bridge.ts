@@ -1,15 +1,18 @@
 import type { JsonRpcMessage } from "./codex-app-server";
 import type {
+  DexlyAgentAuthenticationStatus,
   DexlyAgentDescriptor,
   DexlyAgentId,
   DexlyAgentRuntimeProfile
 } from "./agents";
+import { isDexlyAgentId, isDexlyAgentRuntimeProfile } from "./agents";
 
 export type DexlyBridgeHostAction =
   | "host/health"
   | "host/connect"
   | "host/disconnect"
   | "host/update"
+  | "host/authenticate-agent"
   | "host/install-agent"
   | "host/install-codex";
 export type DexlyBridgeMessageKind =
@@ -27,6 +30,7 @@ export interface DexlyHostCapabilities {
   rollback: boolean;
   agents?: boolean;
   installAgent?: boolean;
+  authenticateAgent?: boolean;
 }
 
 export interface DexlyHostMetadata {
@@ -64,6 +68,10 @@ export interface DexlyHostInstallAgentParams {
   agentId: DexlyAgentId;
 }
 
+export interface DexlyHostAuthenticateAgentParams {
+  agentId: DexlyAgentId;
+}
+
 export interface DexlyHostUpdateParams {
   distTag: string;
   version?: string | null;
@@ -86,11 +94,17 @@ export interface DexlyHostInstallAgentResult extends DexlyHostMetadata {
   installCommand: string;
 }
 
+export interface DexlyHostAuthenticateAgentResult extends DexlyHostMetadata {
+  agentId: DexlyAgentId;
+  authenticationStatus: DexlyAgentAuthenticationStatus;
+}
+
 export type DexlyBridgeRequestMap = {
   "host/health": undefined;
   "host/connect": DexlyHostConnectParams | undefined;
   "host/disconnect": undefined;
   "host/update": DexlyHostUpdateParams;
+  "host/authenticate-agent": DexlyHostAuthenticateAgentParams;
   "host/install-agent": DexlyHostInstallAgentParams;
   "host/install-codex": undefined;
 };
@@ -100,6 +114,7 @@ export type DexlyBridgeResultMap = {
   "host/connect": DexlyHostConnectResult;
   "host/disconnect": DexlyHostDisconnectResult;
   "host/update": DexlyHostUpdateResult;
+  "host/authenticate-agent": DexlyHostAuthenticateAgentResult;
   "host/install-agent": DexlyHostInstallAgentResult;
   "host/install-codex": DexlyHostInstallCodexResult;
 };
@@ -196,17 +211,15 @@ export function isDexlyBridgeRequest(value: unknown): value is DexlyBridgeReques
         typeof candidate.params === "object"
         && candidate.params != null
         && ((candidate.params as { agentId?: unknown }).agentId === undefined
-          || (candidate.params as { agentId?: unknown }).agentId === "codex"
-          || (candidate.params as { agentId?: unknown }).agentId === "opencode")
+          || isDexlyAgentId((candidate.params as { agentId?: unknown }).agentId))
         && ((candidate.params as { profile?: unknown }).profile === undefined
-          || (candidate.params as { profile?: unknown }).profile === "code"
-          || (candidate.params as { profile?: unknown }).profile === "web-readonly")
+          || isDexlyAgentRuntimeProfile((candidate.params as { profile?: unknown }).profile))
       );
     case "host/install-agent":
+    case "host/authenticate-agent":
       return typeof candidate.params === "object"
         && candidate.params != null
-        && ((candidate.params as { agentId?: unknown }).agentId === "codex"
-          || (candidate.params as { agentId?: unknown }).agentId === "opencode");
+        && isDexlyAgentId((candidate.params as { agentId?: unknown }).agentId);
     case "host/update":
       return typeof candidate.params === "object"
         && candidate.params != null
@@ -236,7 +249,7 @@ export function isDexlyBridgeAgentJsonRpcMessage(value: unknown): value is Dexly
     && "kind" in value
     && value.kind === "agent/jsonrpc"
     && "agentId" in value
-    && (value.agentId === "codex" || value.agentId === "opencode")
+    && isDexlyAgentId(value.agentId)
     && "payload" in value;
 }
 
@@ -262,7 +275,7 @@ export function isDexlyBridgeAgentJsonRpcChunk(value: unknown): value is DexlyBr
     && "kind" in value
     && value.kind === "agent/jsonrpc-chunk"
     && "agentId" in value
-    && (value.agentId === "codex" || value.agentId === "opencode")
+    && isDexlyAgentId(value.agentId)
     && "messageId" in value
     && typeof value.messageId === "string"
     && "index" in value

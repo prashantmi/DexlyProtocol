@@ -1,5 +1,7 @@
 import codexCompatibility from "./codex-compatibility.json";
 import opencodeCompatibility from "./opencode-compatibility.json";
+import deepseekCompatibility from "./deepseek-compatibility.json";
+import cursorCompatibility from "./cursor-compatibility.json";
 
 export const DEXLY_COMPANION_HOST_NAME = "ai.dexly.companion";
 export const DEXLY_COMPANION_DISPLAY_NAME = "Dexly Companion";
@@ -33,7 +35,19 @@ export const DEXLY_OPENCODE_AUTH_COMMAND = "opencode auth login";
 // Companion releases that predate the agent-neutral bridge.
 export const DEXLY_OPENCODE_MINIMUM_COMPANION_VERSION = "1.2.0";
 export const DEXLY_OPENCODE_WEB_MINIMUM_COMPANION_VERSION = "1.2.0";
-export const DEXLY_AGENT_PROTOCOL_VERSION = 2;
+export const DEXLY_MULTI_AGENT_MINIMUM_COMPANION_VERSION = "1.3.0";
+export const DEXLY_DEEPSEEK_COMPATIBILITY = deepseekCompatibility;
+export const DEXLY_DEEPSEEK_COMPATIBLE_VERSION = DEXLY_DEEPSEEK_COMPATIBILITY.version;
+export const DEXLY_DEEPSEEK_PACKAGE_SPEC =
+  `${DEXLY_DEEPSEEK_COMPATIBILITY.packageName}@${DEXLY_DEEPSEEK_COMPATIBLE_VERSION}`;
+export const DEXLY_DEEPSEEK_INSTALL_COMMAND =
+  `npx -y ${DEXLY_COMPANION_PACKAGE_NAME} install-deepseek`;
+export const DEXLY_DEEPSEEK_CREDENTIALS_HINT =
+  "Set DEEPSEEK_API_KEY in the launch environment or store it in $DSH_HOME/.credentials.yaml.";
+export const DEXLY_CURSOR_COMPATIBILITY = cursorCompatibility;
+export const DEXLY_CURSOR_INSTALL_DOCS_URL = "https://cursor.com/docs/cli/installation";
+export const DEXLY_CURSOR_AUTH_COMMAND = "cursor-agent login";
+export const DEXLY_AGENT_PROTOCOL_VERSION = 3;
 
 export type DexlyExtensionBuildChannel = "development" | "production";
 export type DexlyCompanionReleaseChannel = "latest" | "beta" | "canary";
