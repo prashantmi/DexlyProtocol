@@ -2,6 +2,7 @@ import type { JsonRpcMessage } from "./codex-app-server";
 import type {
   DexlyAgentAuthenticationStatus,
   DexlyAgentDescriptor,
+  DexlyAgentError,
   DexlyAgentId,
   DexlyAgentRuntimeProfile
 } from "./agents";
@@ -147,6 +148,8 @@ export interface DexlyBridgeError {
   message: string;
   /** Older companions omit this field; clients must treat omission as fatal. */
   fatal?: boolean;
+  /** Present for provider-scoped failures on agent-aware companions. */
+  agentError?: DexlyAgentError;
   details?: unknown;
 }
 

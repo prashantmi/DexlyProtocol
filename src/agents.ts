@@ -17,6 +17,53 @@ export type DexlyAgentDistribution = "managed" | "user-managed";
 /** Authentication state observed by the Companion without retaining account identity. */
 export type DexlyAgentAuthenticationStatus = "unknown" | "required" | "authenticated";
 
+export type DexlyAgentErrorCategory =
+  | "invalid-input"
+  | "unsupported-capability"
+  | "not-installed"
+  | "incompatible-version"
+  | "authentication"
+  | "quota"
+  | "network"
+  | "process"
+  | "bridge"
+  | "protocol"
+  | "session"
+  | "permission"
+  | "cancelled"
+  | "structured-output"
+  | "internal";
+
+export type DexlyAgentErrorAction =
+  | "retry"
+  | "login"
+  | "install"
+  | "update"
+  | "start-fresh"
+  | "reconnect"
+  | "remain-on-current-agent"
+  | "none";
+
+/**
+ * Serializable provider failure safe to carry across the native bridge.
+ * Diagnostic text must be bounded and redacted by the process that owns it.
+ */
+export interface DexlyAgentError {
+  code: string;
+  category: DexlyAgentErrorCategory;
+  agentId: DexlyAgentId;
+  operation: string;
+  runtimeProfile: DexlyAgentRuntimeProfile;
+  correlationId: string;
+  retryable: boolean;
+  retryAfterMs?: number;
+  taskStarted: boolean;
+  partialOutputPossible: boolean;
+  message: string;
+  recommendedAction: DexlyAgentErrorAction;
+  diagnostic?: string;
+}
+
 export interface DexlyAgentWebSafety {
   readOnly: "native-sandbox" | "agent-mode" | "isolated-policy" | "none";
   isolatedProcess: boolean;
@@ -162,6 +209,61 @@ export function isDexlyAgentId(value: unknown): value is DexlyAgentId {
 
 export function isDexlyAgentRuntimeProfile(value: unknown): value is DexlyAgentRuntimeProfile {
   return value === "code" || value === "web-readonly";
+}
+
+function isDexlyAgentErrorCategory(value: unknown): value is DexlyAgentErrorCategory {
+  return typeof value === "string" && [
+    "invalid-input",
+    "unsupported-capability",
+    "not-installed",
+    "incompatible-version",
+    "authentication",
+    "quota",
+    "network",
+    "process",
+    "bridge",
+    "protocol",
+    "session",
+    "permission",
+    "cancelled",
+    "structured-output",
+    "internal"
+  ].includes(value);
+}
+
+function isDexlyAgentErrorAction(value: unknown): value is DexlyAgentErrorAction {
+  return typeof value === "string" && [
+    "retry",
+    "login",
+    "install",
+    "update",
+    "start-fresh",
+    "reconnect",
+    "remain-on-current-agent",
+    "none"
+  ].includes(value);
+}
+
+export function isDexlyAgentError(value: unknown): value is DexlyAgentError {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<DexlyAgentError>;
+  return typeof candidate.code === "string"
+    && isDexlyAgentErrorCategory(candidate.category)
+    && isDexlyAgentId(candidate.agentId)
+    && typeof candidate.operation === "string"
+    && isDexlyAgentRuntimeProfile(candidate.runtimeProfile)
+    && typeof candidate.correlationId === "string"
+    && typeof candidate.retryable === "boolean"
+    && (candidate.retryAfterMs === undefined || (
+      typeof candidate.retryAfterMs === "number"
+      && Number.isFinite(candidate.retryAfterMs)
+      && candidate.retryAfterMs >= 0
+    ))
+    && typeof candidate.taskStarted === "boolean"
+    && typeof candidate.partialOutputPossible === "boolean"
+    && typeof candidate.message === "string"
+    && isDexlyAgentErrorAction(candidate.recommendedAction)
+    && (candidate.diagnostic === undefined || typeof candidate.diagnostic === "string");
 }
 
 export function isDexlyAcpAgentId(value: DexlyAgentId): boolean {
